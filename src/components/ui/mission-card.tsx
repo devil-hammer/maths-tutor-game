@@ -24,7 +24,7 @@ export function MissionCard({
   const prefersReducedMotion = useReducedMotion();
 
   function handleStartMission() {
-    startMission(mission.id);
+    void startMission(mission.id);
     setMascotMood("encourage");
     void playSoundEffect("missionStart", soundEnabled);
   }

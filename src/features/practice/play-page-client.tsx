@@ -17,13 +17,15 @@ export function PlayPageClient() {
   const mission = missionMap[missionId];
   const activeSession = usePlayerStore((state) => state.activeSession);
   const lastSummary = usePlayerStore((state) => state.lastSummary);
+  const isHydrated = usePlayerStore((state) => state.isHydrated);
+  const saveError = usePlayerStore((state) => state.saveError);
   const startMission = usePlayerStore((state) => state.startMission);
   const clearSummary = usePlayerStore((state) => state.clearSummary);
   const setMascotMood = usePlayerStore((state) => state.setMascotMood);
   const soundEnabled = usePlayerStore((state) => state.settings.soundEnabled);
 
   useEffect(() => {
-    if (!mission) {
+    if (!mission || !isHydrated) {
       return;
     }
 
@@ -32,9 +34,9 @@ export function PlayPageClient() {
     }
 
     if (!activeSession || activeSession.missionId !== mission.id) {
-      startMission(mission.id);
+      void startMission(mission.id);
     }
-  }, [activeSession, lastSummary?.missionId, mission, startMission]);
+  }, [activeSession, isHydrated, lastSummary?.missionId, mission, startMission]);
 
   const currentQuestion = useMemo(() => {
     if (!activeSession) {
@@ -59,6 +61,14 @@ export function PlayPageClient() {
     );
   }
 
+  if (!isHydrated) {
+    return (
+      <div className="rounded-[2rem] bg-white/90 p-8 text-center text-lg font-semibold text-slate-600 shadow-xl">
+        Loading your mission...
+      </div>
+    );
+  }
+
   if (!activeSession && lastSummary?.missionId === mission.id) {
     return <ResultsPanel summary={lastSummary} />;
   }
@@ -73,13 +83,19 @@ export function PlayPageClient() {
 
   function handleRestartMission() {
     clearSummary();
-    startMission(mission.id);
+    void startMission(mission.id);
     setMascotMood("encourage");
     void playSoundEffect("missionStart", soundEnabled);
   }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.3fr_0.8fr]">
+      {saveError ? (
+        <div className="rounded-[1.75rem] border-2 border-rose-200 bg-rose-50 px-5 py-4 text-sm font-semibold text-rose-700 lg:col-span-2">
+          {saveError}
+        </div>
+      ) : null}
+
       <QuestionRound
         key={currentQuestion.id}
         question={currentQuestion}
@@ -170,7 +186,7 @@ function QuestionRound({
     }, 70);
 
     responseTimeoutRef.current = window.setTimeout(() => {
-      submitAnswer(answer, Date.now() - questionStartedAt);
+      void submitAnswer(answer, Date.now() - questionStartedAt);
       setMascotMood(null);
     }, 800);
   }

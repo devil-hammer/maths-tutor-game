@@ -13,7 +13,7 @@ export function SoundToggle() {
   async function handleToggle() {
     const nextEnabled = !soundEnabled;
 
-    setSoundEnabled(nextEnabled);
+    void setSoundEnabled(nextEnabled);
 
     if (nextEnabled) {
       await unlockSound();

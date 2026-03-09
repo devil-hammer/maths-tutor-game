@@ -58,7 +58,7 @@ export function ResultsPanel({ summary }: ResultsPanelProps) {
         initial={prefersReducedMotion ? false : { scale: 0.97, opacity: 0 }}
         animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1, opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.05 }}
-        className="rounded-[2rem] bg-gradient-to-br from-amber-100 via-white to-violet-100 px-6 py-8 text-center"
+        className="rounded-[2rem] bg-gradient-to-br from-violet-100 via-white to-fuchsia-100 px-6 py-8 text-center"
       >
         <p className="text-sm font-bold uppercase tracking-[0.25em] text-violet-500">Mission Complete</p>
         <h2 className="mt-2 text-4xl font-black text-slate-900">You did an amazing job!</h2>
@@ -143,7 +143,7 @@ export function ResultsPanel({ summary }: ResultsPanelProps) {
             <Link
               href={`/play?mission=${recommendedMission.id}`}
               onClick={() => {
-                startMission(recommendedMission.id);
+                void startMission(recommendedMission.id);
                 void playSoundEffect("missionStart", soundEnabled);
               }}
               className="rounded-full bg-sky-500 px-5 py-3 text-sm font-black text-white"
@@ -153,7 +153,7 @@ export function ResultsPanel({ summary }: ResultsPanelProps) {
             <Link
               href={`/play?mission=${summary.missionId}`}
               onClick={() => {
-                startMission(summary.missionId);
+                void startMission(summary.missionId);
                 void playSoundEffect("missionStart", soundEnabled);
               }}
               className="rounded-full border-2 border-violet-200 bg-violet-50 px-5 py-3 text-sm font-black text-violet-700"

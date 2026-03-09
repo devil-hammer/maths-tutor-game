@@ -1,13 +1,13 @@
 import { AppShell } from "@/components/ui/app-shell";
-import { ProgressPageClient } from "@/features/progression/progress-page-client";
+import { ShopPageClient } from "@/features/shop/shop-page-client";
 import { getProtectedPageData } from "@/lib/server/protected-page";
 
-export default async function ProgressPage() {
+export default async function ShopPage() {
   const { user, progress } = await getProtectedPageData();
 
   return (
     <AppShell currentUser={user} initialPlayerState={progress}>
-      <ProgressPageClient />
+      <ShopPageClient />
     </AppShell>
   );
 }

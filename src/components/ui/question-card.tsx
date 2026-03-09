@@ -31,7 +31,7 @@ export function QuestionCard({
       className="rounded-[2rem] border-4 border-white bg-white/90 p-6 shadow-[0_18px_60px_rgba(59,130,246,0.18)]"
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-bold text-amber-700">
+        <span className="rounded-full bg-violet-100 px-3 py-1 text-sm font-bold text-violet-700">
           Question {questionNumber} of {totalQuestions}
         </span>
         <span className="rounded-full bg-sky-100 px-3 py-1 text-sm font-bold text-sky-700">

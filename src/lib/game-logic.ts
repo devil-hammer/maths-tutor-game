@@ -33,9 +33,9 @@ export function createDefaultSkills(): SkillMap {
   };
 }
 
-export function createDefaultProfile(): PlayerProfile {
+export function createDefaultProfile(playerName = "Maths Explorer"): PlayerProfile {
   return {
-    playerName: "Maths Explorer",
+    playerName,
     level: 1,
     xp: 0,
     coins: 0,
@@ -47,6 +47,13 @@ export function createDefaultProfile(): PlayerProfile {
     totalCorrect: 0,
     badges: [],
     lastPlayedDate: null,
+    ownedNovaItems: ["mane-classic", "horn-moonbeam", "accessory-none", "trail-none"],
+    equippedNovaItems: {
+      mane: "mane-classic",
+      horn: "horn-moonbeam",
+      accessory: "accessory-none",
+      trail: "trail-none",
+    },
   };
 }
 

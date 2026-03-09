@@ -8,6 +8,39 @@ export type BadgeId =
   | "streak-starter"
   | "number-ninja";
 
+export type NovaCosmeticSlot = "mane" | "horn" | "accessory" | "trail";
+
+export type NovaItemId =
+  | "mane-classic"
+  | "mane-rainbow"
+  | "mane-comet"
+  | "horn-moonbeam"
+  | "horn-crystal"
+  | "horn-sunbeam"
+  | "accessory-none"
+  | "accessory-crown"
+  | "accessory-glasses"
+  | "trail-none"
+  | "trail-stardust"
+  | "trail-cloud";
+
+export interface NovaLoadout {
+  mane: NovaItemId;
+  horn: NovaItemId;
+  accessory: NovaItemId;
+  trail: NovaItemId;
+}
+
+export interface NovaShopItem {
+  id: NovaItemId;
+  slot: NovaCosmeticSlot;
+  title: string;
+  description: string;
+  preview: string;
+  costCoins: number;
+  requiredStars: number;
+}
+
 export interface MissionDefinition {
   id: string;
   title: string;
@@ -89,6 +122,8 @@ export interface PlayerProfile {
   totalCorrect: number;
   badges: BadgeId[];
   lastPlayedDate: string | null;
+  ownedNovaItems: NovaItemId[];
+  equippedNovaItems: NovaLoadout;
 }
 
 export interface AppSettings {
@@ -96,3 +131,16 @@ export interface AppSettings {
 }
 
 export type SkillMap = Record<Operation, SkillProgress>;
+
+export interface PersistedPlayerState {
+  profile: PlayerProfile;
+  skills: SkillMap;
+  settings: AppSettings;
+  activeSession: ActiveSession | null;
+}
+
+export interface AuthUser {
+  id: string;
+  username: string;
+  createdAt: string;
+}
