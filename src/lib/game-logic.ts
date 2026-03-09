@@ -47,6 +47,8 @@ export function createDefaultProfile(playerName = "Maths Explorer"): PlayerProfi
     totalCorrect: 0,
     badges: [],
     lastPlayedDate: null,
+    ownedMascots: ["nova"],
+    activeMascotId: "nova",
     ownedNovaItems: ["mane-classic", "horn-moonbeam", "accessory-none", "trail-none"],
     equippedNovaItems: {
       mane: "mane-classic",
@@ -440,7 +442,12 @@ export function finalizeSession(
     bestStreakDays: Math.max(profile.bestStreakDays, nextStreakDays),
     lastPlayedDate: todayStamp,
     badges: profile.badges,
+    ownedMascots: profile.ownedMascots,
+    activeMascotId: profile.activeMascotId,
   };
+  if (nextProfile.stars >= 25 && !nextProfile.ownedMascots.includes("orbit")) {
+    nextProfile.ownedMascots = [...nextProfile.ownedMascots, "orbit"];
+  }
   const nextBadges = addBadges(profile, summary, profile.lastPlayedDate);
   const badgesUnlocked = nextBadges.filter((badgeId) => !profile.badges.includes(badgeId));
 

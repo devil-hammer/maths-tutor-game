@@ -8,6 +8,15 @@ export type BadgeId =
   | "streak-starter"
   | "number-ninja";
 
+export type MascotId = "nova" | "orbit";
+
+export interface MascotDefinition {
+  id: MascotId;
+  name: string;
+  description: string;
+  requiredStars: number;
+}
+
 export type NovaCosmeticSlot = "mane" | "horn" | "accessory" | "trail";
 
 export type NovaItemId =
@@ -122,6 +131,8 @@ export interface PlayerProfile {
   totalCorrect: number;
   badges: BadgeId[];
   lastPlayedDate: string | null;
+  ownedMascots: MascotId[];
+  activeMascotId: MascotId;
   ownedNovaItems: NovaItemId[];
   equippedNovaItems: NovaLoadout;
 }

@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 
-import { novaShopItemMap } from "@/lib/content";
+import { mascotMap, novaShopItemMap } from "@/lib/content";
 import {
   applyAnswerToSession,
   finalizeSession,
@@ -11,6 +11,7 @@ import {
 import { createInitialPlayerState, normalizePersistedPlayerState } from "@/lib/player-state";
 import {
   ActiveSession,
+  MascotId,
   MascotMood,
   NovaItemId,
   PersistedPlayerState,
@@ -38,6 +39,7 @@ interface PlayerStoreState {
   resetSession: () => Promise<void>;
   setSoundEnabled: (enabled: boolean) => Promise<void>;
   setMascotMood: (mood: MascotMood | null) => void;
+  setActiveMascot: (mascotId: MascotId) => Promise<void>;
   buyNovaItem: (itemId: NovaItemId) => Promise<void>;
   equipNovaItem: (itemId: NovaItemId) => Promise<void>;
   importLegacyProgress: (progress: PersistedPlayerState) => Promise<void>;
@@ -258,6 +260,46 @@ export const usePlayerStore = create<PlayerStoreState>()((set, get) => ({
     set({
       mascotMood: mood,
     }),
+  setActiveMascot: async (mascotId) => {
+    const mascot = mascotMap[mascotId];
+
+    if (!mascot) {
+      throw new Error("That mascot could not be found.");
+    }
+
+    const profile = get().profile;
+
+    if (!profile.ownedMascots.includes(mascotId)) {
+      throw new Error(`Earn ${mascot.requiredStars} stars to unlock ${mascot.name}.`);
+    }
+
+    const nextProgress: PersistedPlayerState = {
+      ...selectPersistedState(get()),
+      profile: {
+        ...profile,
+        activeMascotId: mascotId,
+      },
+    };
+
+    set({
+      ...nextProgress,
+      isSaving: true,
+      saveError: null,
+    });
+
+    try {
+      await saveProgress(nextProgress);
+      set({
+        isSaving: false,
+      });
+    } catch (error) {
+      set({
+        isSaving: false,
+        saveError: getErrorMessage(error),
+      });
+      throw error;
+    }
+  },
   buyNovaItem: async (itemId) => {
     const item = novaShopItemMap[itemId];
 

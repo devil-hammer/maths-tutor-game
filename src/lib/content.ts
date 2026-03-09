@@ -1,4 +1,11 @@
-import { BadgeDefinition, MissionDefinition, NovaCosmeticSlot, NovaShopItem, Operation } from "@/lib/types";
+import {
+  BadgeDefinition,
+  MascotDefinition,
+  MissionDefinition,
+  NovaCosmeticSlot,
+  NovaShopItem,
+  Operation,
+} from "@/lib/types";
 
 export const operations: Operation[] = [
   "addition",
@@ -77,6 +84,26 @@ export const badges: BadgeDefinition[] = [
     description: "Reach level 5 and show your maths mastery.",
   },
 ];
+
+export const mascots: MascotDefinition[] = [
+  {
+    id: "nova",
+    name: "Nova",
+    description: "Your bright unicorn guide from the very start.",
+    requiredStars: 0,
+  },
+  {
+    id: "orbit",
+    name: "Orbit",
+    description: "A tiny star dragon who joins the team after a big milestone.",
+    requiredStars: 25,
+  },
+];
+
+export const mascotMap = Object.fromEntries(mascots.map((mascot) => [mascot.id, mascot])) as Record<
+  MascotDefinition["id"],
+  MascotDefinition
+>;
 
 export const missionMap = Object.fromEntries(
   missions.map((mission) => [mission.id, mission]),

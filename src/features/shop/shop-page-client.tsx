@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 
-import { novaShopItems, novaSlotLabels } from "@/lib/content";
+import { mascots, novaShopItems, novaSlotLabels } from "@/lib/content";
+import { ProgressBar } from "@/components/ui/progress-bar";
 import { usePlayerStore } from "@/features/profile/player-store";
-import { NovaCosmeticSlot, NovaItemId, NovaShopItem } from "@/lib/types";
+import { MascotId, NovaCosmeticSlot, NovaItemId, NovaShopItem } from "@/lib/types";
 
 const slotOrder: NovaCosmeticSlot[] = ["mane", "horn", "accessory", "trail"];
 
@@ -15,7 +16,9 @@ export function ShopPageClient() {
   const saveError = usePlayerStore((state) => state.saveError);
   const buyNovaItem = usePlayerStore((state) => state.buyNovaItem);
   const equipNovaItem = usePlayerStore((state) => state.equipNovaItem);
+  const setActiveMascot = usePlayerStore((state) => state.setActiveMascot);
   const [pendingItemId, setPendingItemId] = useState<NovaItemId | null>(null);
+  const [pendingMascotId, setPendingMascotId] = useState<MascotId | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const groupedItems = useMemo(
@@ -44,6 +47,19 @@ export function ShopPageClient() {
     }
   }
 
+  async function handleMascotSwitch(mascotId: MascotId) {
+    setPendingMascotId(mascotId);
+    setActionError(null);
+
+    try {
+      await setActiveMascot(mascotId);
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Unable to switch mascot.");
+    } finally {
+      setPendingMascotId(null);
+    }
+  }
+
   if (!isHydrated) {
     return (
       <div className="rounded-[2rem] bg-white/90 p-8 text-center text-lg font-semibold text-slate-600 shadow-xl">
@@ -68,17 +84,91 @@ export function ShopPageClient() {
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-[2.5rem] border-4 border-white bg-white/90 p-6 shadow-xl">
-          <p className="text-sm font-bold uppercase tracking-[0.25em] text-violet-500">Nova Shop</p>
-          <h2 className="mt-2 text-4xl font-black text-slate-900">Spend coins on Nova styles</h2>
+          <p className="text-sm font-bold uppercase tracking-[0.25em] text-violet-500">Mascot Shop</p>
+          <h2 className="mt-2 text-4xl font-black text-slate-900">Build your mascot team</h2>
           <p className="mt-3 max-w-2xl text-lg leading-8 text-slate-600">
-            Coins buy fun cosmetic upgrades, while stars unlock the rare looks. Nothing changes gameplay, but
-            Nova gets more magical as each child progresses.
+            Coins buy fun cosmetic upgrades, while stars unlock rare styles and new mascot friends. Nothing
+            changes gameplay, but your guides become more magical as each child progresses.
           </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
           <BalanceCard label="Coins" value={profile.coins.toString()} tone="sky" />
           <BalanceCard label="Stars" value={profile.stars.toString()} tone="violet" />
+        </div>
+      </section>
+
+      <section className="rounded-[2.5rem] border-4 border-white bg-white/90 p-6 shadow-[0_18px_60px_rgba(124,58,237,0.12)]">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-500">Mascot Friends</p>
+            <h3 className="text-2xl font-black text-slate-900">Choose who floats beside you</h3>
+          </div>
+          <div className="rounded-full bg-sky-50 px-4 py-2 text-sm font-bold text-sky-700">
+            {profile.ownedMascots.length}/{mascots.length} unlocked
+          </div>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-2">
+          {mascots.map((mascot) => {
+            const isOwned = profile.ownedMascots.includes(mascot.id);
+            const isActive = profile.activeMascotId === mascot.id;
+            const remainingStars = Math.max(0, mascot.requiredStars - profile.stars);
+            const progress = mascot.requiredStars === 0 ? 100 : (profile.stars / mascot.requiredStars) * 100;
+
+            return (
+              <article key={mascot.id} className="rounded-[2rem] bg-slate-100 p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-500">
+                      {mascot.id === "nova" ? "Starter Guide" : "Unlockable Friend"}
+                    </p>
+                    <h4 className="mt-1 text-2xl font-black text-slate-900">{mascot.name}</h4>
+                  </div>
+                  <div className="rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-slate-500">
+                    {isActive ? "Active" : isOwned ? "Unlocked" : "Locked"}
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-[1.5rem] bg-gradient-to-br from-violet-100 via-white to-sky-100 px-4 py-5 text-center">
+                  <div className="text-4xl" aria-hidden="true">
+                    {mascot.id === "nova" ? "🦄" : "🐉"}
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{mascot.description}</p>
+                </div>
+
+                {isOwned ? (
+                  <p className="mt-4 text-sm font-semibold text-violet-700">
+                    {isActive ? `${mascot.name} is guiding you right now.` : `Switch to ${mascot.name} anytime.`}
+                  </p>
+                ) : (
+                  <>
+                    <div className="mt-4">
+                      <ProgressBar value={Math.min(progress, 100)} label={`${profile.stars}/${mascot.requiredStars} stars`} />
+                    </div>
+                    <p className="mt-3 text-sm font-semibold text-sky-700">
+                      Earn {remainingStars} more star{remainingStars === 1 ? "" : "s"} to unlock {mascot.name}.
+                    </p>
+                  </>
+                )}
+
+                <button
+                  type="button"
+                  disabled={!isOwned || isActive || isSaving || pendingMascotId === mascot.id}
+                  onClick={() => void handleMascotSwitch(mascot.id)}
+                  className={`mt-5 w-full rounded-full px-5 py-3 text-sm font-black text-white transition ${
+                    isActive
+                      ? "bg-slate-300"
+                      : isOwned
+                        ? "bg-violet-500 hover:-translate-y-0.5"
+                        : "bg-slate-300"
+                  } disabled:cursor-not-allowed disabled:opacity-70`}
+                >
+                  {pendingMascotId === mascot.id ? "Switching..." : isActive ? "Active Mascot" : isOwned ? `Switch to ${mascot.name}` : `Unlock at ${mascot.requiredStars} stars`}
+                </button>
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -91,7 +181,7 @@ export function ShopPageClient() {
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-sky-600">{novaSlotLabels[slot]}</p>
               <h3 className="text-2xl font-black text-slate-900">
-                Equipped: {items.find((item) => item.id === profile.equippedNovaItems[slot])?.title}
+                Equipped on Nova: {items.find((item) => item.id === profile.equippedNovaItems[slot])?.title}
               </h3>
             </div>
             <div className="rounded-full bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700">

@@ -1,6 +1,6 @@
 import { operations } from "@/lib/content";
 import { createDefaultProfile, createDefaultSkills } from "@/lib/game-logic";
-import { PersistedPlayerState, SkillMap } from "@/lib/types";
+import { MascotId, PersistedPlayerState, SkillMap } from "@/lib/types";
 
 export const PLAYER_STORE_STORAGE_KEY = "maths-tutor-player-store";
 
@@ -66,11 +66,22 @@ export function normalizePersistedPlayerState(
     typeof nextProfile.playerName === "string" && nextProfile.playerName.trim().length > 0
       ? nextProfile.playerName.trim()
       : fallbackPlayerName;
+  const ownedMascots = Array.isArray(nextProfile.ownedMascots)
+    ? nextProfile.ownedMascots.filter((mascotId): mascotId is "nova" | "orbit" => mascotId === "nova" || mascotId === "orbit")
+    : defaults.profile.ownedMascots;
+  const normalizedOwnedMascots: MascotId[] = ownedMascots.includes("nova") ? ownedMascots : ["nova", ...ownedMascots];
+  if (typeof nextProfile.stars === "number" && nextProfile.stars >= 25 && !normalizedOwnedMascots.includes("orbit")) {
+    normalizedOwnedMascots.push("orbit");
+  }
+  const activeMascotId =
+    nextProfile.activeMascotId === "orbit" && normalizedOwnedMascots.includes("orbit") ? "orbit" : "nova";
 
   return {
     profile: {
       ...nextProfile,
       playerName,
+      ownedMascots: normalizedOwnedMascots,
+      activeMascotId,
     },
     skills: normalizeSkills(value.skills),
     settings: isRecord(value.settings)

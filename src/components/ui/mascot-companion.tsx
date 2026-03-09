@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
-import { missionMap, novaShopItems } from "@/lib/content";
+import { mascotMap, missionMap, novaShopItems } from "@/lib/content";
 import { usePlayerStore } from "@/features/profile/player-store";
 import { ActiveSession, MascotMood, PlayerProfile, SessionSummary } from "@/lib/types";
 
@@ -45,6 +45,7 @@ function getMascotCopy({
   lastSummary,
 }: MascotCompanionProps) {
   const fallback = moodCopy[mood];
+  const mascotName = mascotMap[profile.activeMascotId].name;
 
   if (pathname === "/") {
     if (activeSession) {
@@ -53,14 +54,14 @@ function getMascotCopy({
       return {
         ...fallback,
         title: "Mission waiting",
-        subtitle: mission ? `${mission.title} is ready when you are.` : "Jump back in and keep your streak going.",
+        subtitle: mission ? `${mission.title} is ready when you are.` : `${mascotName} is ready when you are.`,
       };
     }
 
     if (profile.coins >= 120) {
       return {
         ...fallback,
-        title: "Nova can upgrade",
+        title: `${mascotName} can upgrade`,
         subtitle: `You have ${profile.coins} coins to spend in the shop.`,
       };
     }
@@ -83,12 +84,20 @@ function getMascotCopy({
 
     return {
       ...fallback,
-      title: "Adventure map",
+      title: `${mascotName} is ready`,
       subtitle: "Choose the next mission and keep your powers growing.",
     };
   }
 
   if (pathname === "/shop") {
+    if (!profile.ownedMascots.includes("orbit")) {
+      return {
+        ...fallback,
+        title: "Orbit is waiting",
+        subtitle: `Earn ${Math.max(0, 25 - profile.stars)} more stars to unlock your baby dragon.`,
+      };
+    }
+
     const affordableItems = novaShopItems.filter(
       (item) =>
         !profile.ownedNovaItems.includes(item.id) &&
@@ -100,14 +109,14 @@ function getMascotCopy({
       return {
         ...fallback,
         title: "New looks ready",
-        subtitle: `${affordableItems} Nova style${affordableItems === 1 ? "" : "s"} can be bought now.`,
+        subtitle: `${affordableItems} style${affordableItems === 1 ? "" : "s"} can be bought now for Nova.`,
       };
     }
 
     return {
       ...fallback,
-      title: "Style mission",
-      subtitle: "Earn coins and stars to unlock Nova's rarest looks.",
+      title: "Mascot team",
+      subtitle: "Switch guides or save up for more magical style upgrades.",
     };
   }
 
@@ -135,7 +144,7 @@ function getMascotCopy({
       return {
         ...fallback,
         title: "Keep going",
-        subtitle: `${questionsLeft} questions left. Calm thinking beats rushing.`,
+        subtitle: `${questionsLeft} questions left. ${mascotName} believes in calm thinking.`,
       };
     }
   }
@@ -148,7 +157,7 @@ function getMascotCopy({
       return {
         ...fallback,
         title: "Badge power",
-        subtitle: `You have ${profile.badges.length} badge${profile.badges.length === 1 ? "" : "s"} so far.`,
+        subtitle: `${mascotName} is proud of your ${profile.badges.length} badge${profile.badges.length === 1 ? "" : "s"}.`,
       };
     }
 
@@ -168,6 +177,7 @@ export function MascotCompanion({ mood, pathname, profile, activeSession, lastSu
   const prefersReducedMotion = useReducedMotion();
   const copy = getMascotCopy({ mood, pathname, profile, activeSession, lastSummary });
   const equippedNovaItems = usePlayerStore((state) => state.profile.equippedNovaItems);
+  const isOrbit = profile.activeMascotId === "orbit";
   const mouthClass =
     mood === "support"
       ? "h-2.5 w-3.5 rounded-full border-2 border-slate-900 bg-transparent"
@@ -266,52 +276,79 @@ export function MascotCompanion({ mood, pathname, profile, activeSession, lastSu
             </>
           ) : null}
 
-          <div className="absolute left-4 top-5 h-9 w-8 -rotate-[18deg] rounded-t-[1.2rem] rounded-br-[1rem] bg-white shadow-sm" />
-          <div className="absolute right-4 top-5 rotate-[18deg] rounded-t-[1.2rem] rounded-bl-[1rem] bg-white shadow-sm">
-            <div className="h-9 w-8" />
-          </div>
-          <div className="absolute left-[1.35rem] top-8 h-4 w-4 -rotate-[18deg] rounded-t-full rounded-br-full bg-violet-200" />
-          <div className="absolute right-[1.35rem] top-8 h-4 w-4 rotate-[18deg] rounded-t-full rounded-bl-full bg-fuchsia-200" />
+          {isOrbit ? (
+            <>
+              <div className="absolute left-4 top-4 h-7 w-6 -rotate-[18deg] rounded-t-[1.2rem] rounded-br-[1rem] bg-violet-900 shadow-sm" />
+              <div className="absolute right-4 top-4 rotate-[18deg] rounded-t-[1.2rem] rounded-bl-[1rem] bg-violet-900 shadow-sm">
+                <div className="h-7 w-6" />
+              </div>
+              <div className="absolute left-[1.3rem] top-[1.1rem] h-4 w-3 rotate-[-22deg] rounded-full bg-fuchsia-300" />
+              <div className="absolute right-[1.3rem] top-[1.1rem] h-4 w-3 rotate-[22deg] rounded-full bg-sky-200" />
+              <div className="absolute left-6 top-5 h-3 w-2 rotate-[-25deg] rounded-full bg-violet-300" />
+              <div className="absolute right-6 top-5 h-3 w-2 rotate-[25deg] rounded-full bg-violet-300" />
+              <div className="absolute left-1/2 top-4 h-14 w-[3.8rem] -translate-x-1/2 rounded-[48%] bg-gradient-to-b from-violet-600 to-indigo-900 shadow-[inset_0_-10px_16px_rgba(15,23,42,0.22)]" />
+              <div className="absolute left-1/2 top-10 h-8 w-9 -translate-x-1/2 rounded-[45%] bg-violet-100" />
+              <div className="absolute left-[2rem] top-[2rem] h-2.5 w-2.5 rounded-full bg-white" />
+              <div className="absolute right-[2rem] top-[2rem] h-2.5 w-2.5 rounded-full bg-white" />
+              <div className="absolute left-[2.1rem] top-[2.1rem] h-1 w-1 rounded-full bg-slate-900" />
+              <div className="absolute right-[2.1rem] top-[2.1rem] h-1 w-1 rounded-full bg-slate-900" />
+              <div className="absolute left-1/2 top-[3rem] h-2 w-3 -translate-x-1/2 rounded-full bg-violet-300" />
+              <div className={`absolute top-[3.55rem] left-1/2 -translate-x-1/2 ${mouthClass}`} />
+              <div className={`absolute top-[3.55rem] left-[1.1rem] h-3 w-3 rounded-full ${blushClass}`} />
+              <div className={`absolute top-[3.55rem] right-[1.1rem] h-3 w-3 rounded-full ${blushClass}`} />
+              <div className="absolute left-3 bottom-3 h-5 w-5 rounded-full bg-white/12" />
+              <div className="absolute right-3 bottom-4 h-5 w-5 rounded-full bg-white/12" />
+            </>
+          ) : (
+            <>
+              <div className="absolute left-4 top-5 h-9 w-8 -rotate-[18deg] rounded-t-[1.2rem] rounded-br-[1rem] bg-white shadow-sm" />
+              <div className="absolute right-4 top-5 rotate-[18deg] rounded-t-[1.2rem] rounded-bl-[1rem] bg-white shadow-sm">
+                <div className="h-9 w-8" />
+              </div>
+              <div className="absolute left-[1.35rem] top-8 h-4 w-4 -rotate-[18deg] rounded-t-full rounded-br-full bg-violet-200" />
+              <div className="absolute right-[1.35rem] top-8 h-4 w-4 rotate-[18deg] rounded-t-full rounded-bl-full bg-fuchsia-200" />
 
-          <motion.div
-            animate={
-              prefersReducedMotion
-                ? undefined
-                : mood === "celebrate"
-                  ? { y: [0, -2, 0], rotate: [-8, -2, -8] }
-                  : { y: [0, -1, 0] }
-            }
-            transition={prefersReducedMotion ? undefined : { duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-            className={`absolute left-1/2 top-2 h-8 w-3 -translate-x-1/2 -rotate-[8deg] rounded-full shadow-sm ${hornClass}`}
-          />
+              <motion.div
+                animate={
+                  prefersReducedMotion
+                    ? undefined
+                    : mood === "celebrate"
+                      ? { y: [0, -2, 0], rotate: [-8, -2, -8] }
+                      : { y: [0, -1, 0] }
+                }
+                transition={prefersReducedMotion ? undefined : { duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+                className={`absolute left-1/2 top-2 h-8 w-3 -translate-x-1/2 -rotate-[8deg] rounded-full shadow-sm ${hornClass}`}
+              />
 
-          <div className={`absolute left-4 top-7 h-6 w-6 rounded-full ${maneLayers[0]}`} />
-          <div className={`absolute left-7 top-4 h-6 w-5 rounded-full ${maneLayers[1]}`} />
-          <div className={`absolute right-5 top-6 h-6 w-5 rounded-full ${maneLayers[2]}`} />
-          <div className={`absolute right-7 top-4 h-5 w-4 rounded-full ${maneLayers[3]}`} />
+              <div className={`absolute left-4 top-7 h-6 w-6 rounded-full ${maneLayers[0]}`} />
+              <div className={`absolute left-7 top-4 h-6 w-5 rounded-full ${maneLayers[1]}`} />
+              <div className={`absolute right-5 top-6 h-6 w-5 rounded-full ${maneLayers[2]}`} />
+              <div className={`absolute right-7 top-4 h-5 w-4 rounded-full ${maneLayers[3]}`} />
 
-          <div className="absolute bottom-3 left-1/2 h-14 w-[3.9rem] -translate-x-1/2 rounded-[45%] bg-white shadow-[inset_0_-8px_18px_rgba(139,92,246,0.08)]" />
-          <div className="absolute bottom-2 left-1/2 h-5 w-10 -translate-x-1/2 rounded-full bg-violet-100/85" />
-          <div className="absolute bottom-6 left-[1.9rem] h-2.5 w-2.5 rounded-full bg-slate-900" />
-          <div className="absolute bottom-6 right-[1.9rem] h-2.5 w-2.5 rounded-full bg-slate-900" />
-          <div className="absolute bottom-[2.05rem] left-[2.05rem] h-1 w-1 rounded-full bg-white" />
-          <div className="absolute bottom-[2.05rem] right-[2.05rem] h-1 w-1 rounded-full bg-white" />
-          <div className="absolute bottom-5 left-4 h-2.5 w-2.5 rounded-full bg-slate-900/20" />
-          <div className="absolute bottom-5 right-4 h-2.5 w-2.5 rounded-full bg-slate-900/20" />
-          <div className={`absolute bottom-[0.95rem] left-4 h-3 w-3 rounded-full ${blushClass}`} />
-          <div className={`absolute bottom-[0.95rem] right-4 h-3 w-3 rounded-full ${blushClass}`} />
-          <div className={`absolute bottom-[0.95rem] left-1/2 -translate-x-1/2 ${mouthClass}`} />
+              <div className="absolute bottom-3 left-1/2 h-14 w-[3.9rem] -translate-x-1/2 rounded-[45%] bg-white shadow-[inset_0_-8px_18px_rgba(139,92,246,0.08)]" />
+              <div className="absolute bottom-2 left-1/2 h-5 w-10 -translate-x-1/2 rounded-full bg-violet-100/85" />
+              <div className="absolute bottom-6 left-[1.9rem] h-2.5 w-2.5 rounded-full bg-slate-900" />
+              <div className="absolute bottom-6 right-[1.9rem] h-2.5 w-2.5 rounded-full bg-slate-900" />
+              <div className="absolute bottom-[2.05rem] left-[2.05rem] h-1 w-1 rounded-full bg-white" />
+              <div className="absolute bottom-[2.05rem] right-[2.05rem] h-1 w-1 rounded-full bg-white" />
+              <div className="absolute bottom-5 left-4 h-2.5 w-2.5 rounded-full bg-slate-900/20" />
+              <div className="absolute bottom-5 right-4 h-2.5 w-2.5 rounded-full bg-slate-900/20" />
+              <div className={`absolute bottom-[0.95rem] left-4 h-3 w-3 rounded-full ${blushClass}`} />
+              <div className={`absolute bottom-[0.95rem] right-4 h-3 w-3 rounded-full ${blushClass}`} />
+              <div className={`absolute bottom-[0.95rem] left-1/2 -translate-x-1/2 ${mouthClass}`} />
 
-          <div
-            className={`absolute bottom-[2.85rem] left-[1.45rem] h-1 w-4 rounded-full bg-slate-900 ${
-              mood === "support" ? "-rotate-[18deg]" : "rotate-[8deg]"
-            }`}
-          />
-          <div
-            className={`absolute bottom-[2.85rem] right-[1.45rem] h-1 w-4 rounded-full bg-slate-900 ${
-              mood === "support" ? "rotate-[18deg]" : "-rotate-[8deg]"
-            }`}
-          />
+              <div
+                className={`absolute bottom-[2.85rem] left-[1.45rem] h-1 w-4 rounded-full bg-slate-900 ${
+                  mood === "support" ? "-rotate-[18deg]" : "rotate-[8deg]"
+                }`}
+              />
+              <div
+                className={`absolute bottom-[2.85rem] right-[1.45rem] h-1 w-4 rounded-full bg-slate-900 ${
+                  mood === "support" ? "rotate-[18deg]" : "-rotate-[8deg]"
+                }`}
+              />
+            </>
+          )}
 
           {equippedNovaItems.accessory === "accessory-crown" ? (
             <>
