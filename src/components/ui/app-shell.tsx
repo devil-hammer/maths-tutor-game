@@ -28,6 +28,7 @@ export function AppShell({ currentUser, initialPlayerState, children }: AppShell
   const pathname = usePathname();
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
+  const profile = usePlayerStore((state) => state.profile);
   const activeSession = usePlayerStore((state) => state.activeSession);
   const lastSummary = usePlayerStore((state) => state.lastSummary);
   const mascotMood = usePlayerStore((state) => state.mascotMood);
@@ -131,7 +132,13 @@ export function AppShell({ currentUser, initialPlayerState, children }: AppShell
           {children}
         </motion.main>
       </div>
-      <MascotCompanion mood={currentMood} />
+      <MascotCompanion
+        mood={currentMood}
+        pathname={pathname}
+        profile={profile}
+        activeSession={activeSession}
+        lastSummary={lastSummary}
+      />
     </div>
   );
 }

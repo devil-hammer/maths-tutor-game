@@ -2,11 +2,16 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
+import { missionMap, novaShopItems } from "@/lib/content";
 import { usePlayerStore } from "@/features/profile/player-store";
-import { MascotMood } from "@/lib/types";
+import { ActiveSession, MascotMood, PlayerProfile, SessionSummary } from "@/lib/types";
 
 interface MascotCompanionProps {
   mood: MascotMood;
+  pathname: string;
+  profile: PlayerProfile;
+  activeSession: ActiveSession | null;
+  lastSummary: SessionSummary | null;
 }
 
 const moodCopy: Record<MascotMood, { title: string; subtitle: string; accent: string }> = {
@@ -32,9 +37,136 @@ const moodCopy: Record<MascotMood, { title: string; subtitle: string; accent: st
   },
 };
 
-export function MascotCompanion({ mood }: MascotCompanionProps) {
+function getMascotCopy({
+  mood,
+  pathname,
+  profile,
+  activeSession,
+  lastSummary,
+}: MascotCompanionProps) {
+  const fallback = moodCopy[mood];
+
+  if (pathname === "/") {
+    if (activeSession) {
+      const mission = missionMap[activeSession.missionId];
+
+      return {
+        ...fallback,
+        title: "Mission waiting",
+        subtitle: mission ? `${mission.title} is ready when you are.` : "Jump back in and keep your streak going.",
+      };
+    }
+
+    if (profile.coins >= 120) {
+      return {
+        ...fallback,
+        title: "Nova can upgrade",
+        subtitle: `You have ${profile.coins} coins to spend in the shop.`,
+      };
+    }
+
+    if (profile.streakDays >= 3) {
+      return {
+        ...fallback,
+        title: "Streak magic",
+        subtitle: `Your ${profile.streakDays}-day streak is glowing bright.`,
+      };
+    }
+
+    if (profile.badges.length === 0) {
+      return {
+        ...fallback,
+        title: "First badge time",
+        subtitle: "Pick a mission and earn your first shiny reward.",
+      };
+    }
+
+    return {
+      ...fallback,
+      title: "Adventure map",
+      subtitle: "Choose the next mission and keep your powers growing.",
+    };
+  }
+
+  if (pathname === "/shop") {
+    const affordableItems = novaShopItems.filter(
+      (item) =>
+        !profile.ownedNovaItems.includes(item.id) &&
+        profile.coins >= item.costCoins &&
+        profile.stars >= item.requiredStars,
+    ).length;
+
+    if (affordableItems > 0) {
+      return {
+        ...fallback,
+        title: "New looks ready",
+        subtitle: `${affordableItems} Nova style${affordableItems === 1 ? "" : "s"} can be bought now.`,
+      };
+    }
+
+    return {
+      ...fallback,
+      title: "Style mission",
+      subtitle: "Earn coins and stars to unlock Nova's rarest looks.",
+    };
+  }
+
+  if (pathname === "/play") {
+    if (lastSummary) {
+      return {
+        ...fallback,
+        title: "Mission complete",
+        subtitle: `You earned ${lastSummary.starsEarned} star${lastSummary.starsEarned === 1 ? "" : "s"} and ${lastSummary.coinsEarned} coins.`,
+      };
+    }
+
+    if (activeSession) {
+      const questionsLeft = activeSession.goalCount - activeSession.answers.length;
+      const mission = missionMap[activeSession.missionId];
+
+      if (questionsLeft <= 2) {
+        return {
+          ...fallback,
+          title: "Final stretch",
+          subtitle: `${questionsLeft} question${questionsLeft === 1 ? "" : "s"} left in ${mission?.title ?? "this mission"}.`,
+        };
+      }
+
+      return {
+        ...fallback,
+        title: "Keep going",
+        subtitle: `${questionsLeft} questions left. Calm thinking beats rushing.`,
+      };
+    }
+  }
+
+  if (pathname === "/progress") {
+    const accuracy =
+      profile.totalQuestions > 0 ? Math.round((profile.totalCorrect / profile.totalQuestions) * 100) : 0;
+
+    if (profile.badges.length > 0) {
+      return {
+        ...fallback,
+        title: "Badge power",
+        subtitle: `You have ${profile.badges.length} badge${profile.badges.length === 1 ? "" : "s"} so far.`,
+      };
+    }
+
+    if (profile.totalQuestions > 0) {
+      return {
+        ...fallback,
+        title: "Progress check",
+        subtitle: `${accuracy}% accuracy across ${profile.totalQuestions} answered questions.`,
+      };
+    }
+  }
+
+  return fallback;
+}
+
+export function MascotCompanion({ mood, pathname, profile, activeSession, lastSummary }: MascotCompanionProps) {
   const prefersReducedMotion = useReducedMotion();
-  const copy = moodCopy[mood];
+  const copy = getMascotCopy({ mood, pathname, profile, activeSession, lastSummary });
   const equippedNovaItems = usePlayerStore((state) => state.profile.equippedNovaItems);
   const mouthClass =
     mood === "support"
