@@ -177,6 +177,7 @@ export function MascotCompanion({ mood, pathname, profile, activeSession, lastSu
   const prefersReducedMotion = useReducedMotion();
   const copy = getMascotCopy({ mood, pathname, profile, activeSession, lastSummary });
   const equippedNovaItems = usePlayerStore((state) => state.profile.equippedNovaItems);
+  const equippedOrbitItems = usePlayerStore((state) => state.profile.equippedOrbitItems);
   const isOrbit = profile.activeMascotId === "orbit";
   const mouthClass =
     mood === "support"
@@ -213,6 +214,18 @@ export function MascotCompanion({ mood, pathname, profile, activeSession, lastSu
             "bg-sky-200/90",
             "bg-white/75",
           ];
+  const orbitWingClass =
+    equippedOrbitItems.wings === "wings-comet"
+      ? "bg-gradient-to-br from-sky-300 to-cyan-500"
+      : equippedOrbitItems.wings === "wings-nebula"
+        ? "bg-gradient-to-br from-indigo-700 to-fuchsia-400"
+        : "bg-gradient-to-br from-violet-400 to-fuchsia-300";
+  const orbitHornClass =
+    equippedOrbitItems.horns === "horns-crystal"
+      ? "bg-gradient-to-b from-cyan-100 to-violet-300"
+      : equippedOrbitItems.horns === "horns-sunflare"
+        ? "bg-gradient-to-b from-yellow-100 to-orange-300"
+        : "bg-gradient-to-b from-fuchsia-200 to-violet-300";
 
   const mascotAnimation = prefersReducedMotion
     ? {}
@@ -278,14 +291,16 @@ export function MascotCompanion({ mood, pathname, profile, activeSession, lastSu
 
           {isOrbit ? (
             <>
+              <div className={`absolute left-4 top-8 h-10 w-7 rotate-[-22deg] rounded-[1.5rem] ${orbitWingClass}`} />
+              <div className={`absolute right-4 top-8 h-10 w-7 rotate-[22deg] rounded-[1.5rem] ${orbitWingClass}`} />
               <div className="absolute left-4 top-4 h-7 w-6 -rotate-[18deg] rounded-t-[1.2rem] rounded-br-[1rem] bg-violet-900 shadow-sm" />
               <div className="absolute right-4 top-4 rotate-[18deg] rounded-t-[1.2rem] rounded-bl-[1rem] bg-violet-900 shadow-sm">
                 <div className="h-7 w-6" />
               </div>
-              <div className="absolute left-[1.3rem] top-[1.1rem] h-4 w-3 rotate-[-22deg] rounded-full bg-fuchsia-300" />
-              <div className="absolute right-[1.3rem] top-[1.1rem] h-4 w-3 rotate-[22deg] rounded-full bg-sky-200" />
-              <div className="absolute left-6 top-5 h-3 w-2 rotate-[-25deg] rounded-full bg-violet-300" />
-              <div className="absolute right-6 top-5 h-3 w-2 rotate-[25deg] rounded-full bg-violet-300" />
+              <div className={`absolute left-[1.3rem] top-[1.1rem] h-4 w-3 rotate-[-22deg] rounded-full ${orbitHornClass}`} />
+              <div className={`absolute right-[1.3rem] top-[1.1rem] h-4 w-3 rotate-[22deg] rounded-full ${orbitHornClass}`} />
+              <div className={`absolute left-6 top-5 h-3 w-2 rotate-[-25deg] rounded-full ${orbitHornClass}`} />
+              <div className={`absolute right-6 top-5 h-3 w-2 rotate-[25deg] rounded-full ${orbitHornClass}`} />
               <div className="absolute left-1/2 top-4 h-14 w-[3.8rem] -translate-x-1/2 rounded-[48%] bg-gradient-to-b from-violet-600 to-indigo-900 shadow-[inset_0_-10px_16px_rgba(15,23,42,0.22)]" />
               <div className="absolute left-1/2 top-10 h-8 w-9 -translate-x-1/2 rounded-[45%] bg-violet-100" />
               <div className="absolute left-[2rem] top-[2rem] h-2.5 w-2.5 rounded-full bg-white" />
@@ -296,8 +311,36 @@ export function MascotCompanion({ mood, pathname, profile, activeSession, lastSu
               <div className={`absolute top-[3.55rem] left-1/2 -translate-x-1/2 ${mouthClass}`} />
               <div className={`absolute top-[3.55rem] left-[1.1rem] h-3 w-3 rounded-full ${blushClass}`} />
               <div className={`absolute top-[3.55rem] right-[1.1rem] h-3 w-3 rounded-full ${blushClass}`} />
-              <div className="absolute left-3 bottom-3 h-5 w-5 rounded-full bg-white/12" />
-              <div className="absolute right-3 bottom-4 h-5 w-5 rounded-full bg-white/12" />
+              {equippedOrbitItems.accessory === "orbit-accessory-cape" ? (
+                <div className="absolute left-1/2 top-[3.7rem] h-8 w-7 -translate-x-1/2 rounded-b-[1rem] bg-gradient-to-b from-rose-400 to-fuchsia-600" />
+              ) : null}
+              {equippedOrbitItems.accessory === "orbit-accessory-bandana" ? (
+                <>
+                  <div className="absolute left-1/2 top-[2.55rem] h-2.5 w-9 -translate-x-1/2 rounded-full bg-sky-500" />
+                  <div className="absolute left-[2rem] top-[2.45rem] h-3.5 w-1.5 rotate-[-15deg] rounded-full bg-sky-500" />
+                  <div className="absolute right-[2rem] top-[2.45rem] h-3.5 w-1.5 rotate-[15deg] rounded-full bg-sky-500" />
+                </>
+              ) : null}
+              {equippedOrbitItems.trail === "orbit-trail-embers" ? (
+                <>
+                  <div className="absolute left-3 bottom-3 h-3 w-3 rounded-full bg-amber-300/80" />
+                  <div className="absolute left-6 bottom-6 h-2.5 w-2.5 rounded-full bg-orange-400/80" />
+                  <div className="absolute right-4 bottom-4 h-3 w-3 rounded-full bg-rose-400/80" />
+                </>
+              ) : null}
+              {equippedOrbitItems.trail === "orbit-trail-moons" ? (
+                <>
+                  <div className="absolute left-3 bottom-3 h-4 w-4 rounded-full border-2 border-violet-300/80" />
+                  <div className="absolute left-6 bottom-6 h-3 w-3 rounded-full border-2 border-sky-300/80" />
+                  <div className="absolute right-4 bottom-4 h-4 w-4 rounded-full border-2 border-fuchsia-300/80" />
+                </>
+              ) : null}
+              {equippedOrbitItems.trail === "orbit-trail-none" ? (
+                <>
+                  <div className="absolute left-3 bottom-3 h-5 w-5 rounded-full bg-white/12" />
+                  <div className="absolute right-3 bottom-4 h-5 w-5 rounded-full bg-white/12" />
+                </>
+              ) : null}
             </>
           ) : (
             <>

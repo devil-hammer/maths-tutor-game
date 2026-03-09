@@ -18,6 +18,7 @@ export interface MascotDefinition {
 }
 
 export type NovaCosmeticSlot = "mane" | "horn" | "accessory" | "trail";
+export type OrbitCosmeticSlot = "wings" | "horns" | "accessory" | "trail";
 
 export type NovaItemId =
   | "mane-classic"
@@ -33,6 +34,20 @@ export type NovaItemId =
   | "trail-stardust"
   | "trail-cloud";
 
+export type OrbitItemId =
+  | "wings-feather"
+  | "wings-comet"
+  | "wings-nebula"
+  | "horns-stardust"
+  | "horns-crystal"
+  | "horns-sunflare"
+  | "orbit-accessory-none"
+  | "orbit-accessory-cape"
+  | "orbit-accessory-bandana"
+  | "orbit-trail-none"
+  | "orbit-trail-embers"
+  | "orbit-trail-moons";
+
 export interface NovaLoadout {
   mane: NovaItemId;
   horn: NovaItemId;
@@ -40,9 +55,26 @@ export interface NovaLoadout {
   trail: NovaItemId;
 }
 
+export interface OrbitLoadout {
+  wings: OrbitItemId;
+  horns: OrbitItemId;
+  accessory: OrbitItemId;
+  trail: OrbitItemId;
+}
+
 export interface NovaShopItem {
   id: NovaItemId;
   slot: NovaCosmeticSlot;
+  title: string;
+  description: string;
+  preview: string;
+  costCoins: number;
+  requiredStars: number;
+}
+
+export interface OrbitShopItem {
+  id: OrbitItemId;
+  slot: OrbitCosmeticSlot;
   title: string;
   description: string;
   preview: string;
@@ -135,6 +167,8 @@ export interface PlayerProfile {
   activeMascotId: MascotId;
   ownedNovaItems: NovaItemId[];
   equippedNovaItems: NovaLoadout;
+  ownedOrbitItems: OrbitItemId[];
+  equippedOrbitItems: OrbitLoadout;
 }
 
 export interface AppSettings {

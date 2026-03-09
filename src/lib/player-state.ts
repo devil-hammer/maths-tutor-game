@@ -1,6 +1,6 @@
 import { operations } from "@/lib/content";
 import { createDefaultProfile, createDefaultSkills } from "@/lib/game-logic";
-import { MascotId, PersistedPlayerState, SkillMap } from "@/lib/types";
+import { MascotId, OrbitItemId, PersistedPlayerState, SkillMap } from "@/lib/types";
 
 export const PLAYER_STORE_STORAGE_KEY = "maths-tutor-player-store";
 
@@ -75,6 +75,23 @@ export function normalizePersistedPlayerState(
   }
   const activeMascotId =
     nextProfile.activeMascotId === "orbit" && normalizedOwnedMascots.includes("orbit") ? "orbit" : "nova";
+  const ownedOrbitItems = Array.isArray(nextProfile.ownedOrbitItems)
+    ? nextProfile.ownedOrbitItems.filter(
+        (itemId): itemId is OrbitItemId =>
+          itemId === "wings-feather" ||
+          itemId === "wings-comet" ||
+          itemId === "wings-nebula" ||
+          itemId === "horns-stardust" ||
+          itemId === "horns-crystal" ||
+          itemId === "horns-sunflare" ||
+          itemId === "orbit-accessory-none" ||
+          itemId === "orbit-accessory-cape" ||
+          itemId === "orbit-accessory-bandana" ||
+          itemId === "orbit-trail-none" ||
+          itemId === "orbit-trail-embers" ||
+          itemId === "orbit-trail-moons",
+      )
+    : defaults.profile.ownedOrbitItems;
 
   return {
     profile: {
@@ -82,6 +99,13 @@ export function normalizePersistedPlayerState(
       playerName,
       ownedMascots: normalizedOwnedMascots,
       activeMascotId,
+      ownedOrbitItems,
+      equippedOrbitItems: isRecord(nextProfile.equippedOrbitItems)
+        ? {
+            ...defaults.profile.equippedOrbitItems,
+            ...nextProfile.equippedOrbitItems,
+          }
+        : defaults.profile.equippedOrbitItems,
     },
     skills: normalizeSkills(value.skills),
     settings: isRecord(value.settings)

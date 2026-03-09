@@ -3,6 +3,8 @@ import {
   MascotDefinition,
   MissionDefinition,
   NovaCosmeticSlot,
+  OrbitCosmeticSlot,
+  OrbitShopItem,
   NovaShopItem,
   Operation,
 } from "@/lib/types";
@@ -123,6 +125,13 @@ export const novaSlotLabels: Record<NovaCosmeticSlot, string> = {
   trail: "Trail",
 };
 
+export const orbitSlotLabels: Record<OrbitCosmeticSlot, string> = {
+  wings: "Wings",
+  horns: "Horns",
+  accessory: "Accessory",
+  trail: "Trail",
+};
+
 export const novaShopItems: NovaShopItem[] = [
   {
     id: "mane-classic",
@@ -237,3 +246,118 @@ export const novaShopItems: NovaShopItem[] = [
 export const novaShopItemMap = Object.fromEntries(
   novaShopItems.map((item) => [item.id, item]),
 ) as Record<NovaShopItem["id"], NovaShopItem>;
+
+export const orbitShopItems: OrbitShopItem[] = [
+  {
+    id: "wings-feather",
+    slot: "wings",
+    title: "Feather Wings",
+    description: "Orbit's default soft star-feather wings.",
+    preview: "Feather",
+    costCoins: 0,
+    requiredStars: 0,
+  },
+  {
+    id: "wings-comet",
+    slot: "wings",
+    title: "Comet Wings",
+    description: "Fast comet-streak wings with bright sky tips.",
+    preview: "Comet",
+    costCoins: 140,
+    requiredStars: 28,
+  },
+  {
+    id: "wings-nebula",
+    slot: "wings",
+    title: "Nebula Wings",
+    description: "Galaxy wings glowing with purple space dust.",
+    preview: "Nebula",
+    costCoins: 220,
+    requiredStars: 34,
+  },
+  {
+    id: "horns-stardust",
+    slot: "horns",
+    title: "Stardust Horns",
+    description: "Orbit's starting pair of twinkly baby horns.",
+    preview: "Stardust",
+    costCoins: 0,
+    requiredStars: 0,
+  },
+  {
+    id: "horns-crystal",
+    slot: "horns",
+    title: "Crystal Horns",
+    description: "Icy crystal horns for a sharper sky-dragon look.",
+    preview: "Crystal",
+    costCoins: 150,
+    requiredStars: 30,
+  },
+  {
+    id: "horns-sunflare",
+    slot: "horns",
+    title: "Sunflare Horns",
+    description: "Golden dragon horns lit with warm firelight.",
+    preview: "Sunflare",
+    costCoins: 230,
+    requiredStars: 36,
+  },
+  {
+    id: "orbit-accessory-none",
+    slot: "accessory",
+    title: "No Accessory",
+    description: "Keep Orbit flying light and simple.",
+    preview: "None",
+    costCoins: 0,
+    requiredStars: 0,
+  },
+  {
+    id: "orbit-accessory-cape",
+    slot: "accessory",
+    title: "Hero Cape",
+    description: "A tiny cape for brave sky-dragon missions.",
+    preview: "Cape",
+    costCoins: 160,
+    requiredStars: 29,
+  },
+  {
+    id: "orbit-accessory-bandana",
+    slot: "accessory",
+    title: "Comet Bandana",
+    description: "A playful bandana for dragon explorer style.",
+    preview: "Bandana",
+    costCoins: 170,
+    requiredStars: 32,
+  },
+  {
+    id: "orbit-trail-none",
+    slot: "trail",
+    title: "No Trail",
+    description: "Let Orbit's natural glow do the talking.",
+    preview: "None",
+    costCoins: 0,
+    requiredStars: 0,
+  },
+  {
+    id: "orbit-trail-embers",
+    slot: "trail",
+    title: "Ember Trail",
+    description: "Warm glowing embers swirl behind Orbit.",
+    preview: "Embers",
+    costCoins: 145,
+    requiredStars: 27,
+  },
+  {
+    id: "orbit-trail-moons",
+    slot: "trail",
+    title: "Moon Trail",
+    description: "Tiny moon sparks follow every dragon swoop.",
+    preview: "Moon",
+    costCoins: 200,
+    requiredStars: 35,
+  },
+];
+
+export const orbitShopItemMap = Object.fromEntries(
+  orbitShopItems.map((item) => [item.id, item]),
+) as Record<OrbitShopItem["id"], OrbitShopItem>;

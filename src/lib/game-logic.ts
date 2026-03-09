@@ -56,6 +56,18 @@ export function createDefaultProfile(playerName = "Maths Explorer"): PlayerProfi
       accessory: "accessory-none",
       trail: "trail-none",
     },
+    ownedOrbitItems: [
+      "wings-feather",
+      "horns-stardust",
+      "orbit-accessory-none",
+      "orbit-trail-none",
+    ],
+    equippedOrbitItems: {
+      wings: "wings-feather",
+      horns: "horns-stardust",
+      accessory: "orbit-accessory-none",
+      trail: "orbit-trail-none",
+    },
   };
 }
 
@@ -444,6 +456,8 @@ export function finalizeSession(
     badges: profile.badges,
     ownedMascots: profile.ownedMascots,
     activeMascotId: profile.activeMascotId,
+    ownedOrbitItems: profile.ownedOrbitItems,
+    equippedOrbitItems: profile.equippedOrbitItems,
   };
   if (nextProfile.stars >= 25 && !nextProfile.ownedMascots.includes("orbit")) {
     nextProfile.ownedMascots = [...nextProfile.ownedMascots, "orbit"];

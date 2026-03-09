@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 
-import { mascotMap, novaShopItemMap } from "@/lib/content";
+import { mascotMap, novaShopItemMap, orbitShopItemMap } from "@/lib/content";
 import {
   applyAnswerToSession,
   finalizeSession,
@@ -14,6 +14,7 @@ import {
   MascotId,
   MascotMood,
   NovaItemId,
+  OrbitItemId,
   PersistedPlayerState,
   SessionSummary,
 } from "@/lib/types";
@@ -42,6 +43,8 @@ interface PlayerStoreState {
   setActiveMascot: (mascotId: MascotId) => Promise<void>;
   buyNovaItem: (itemId: NovaItemId) => Promise<void>;
   equipNovaItem: (itemId: NovaItemId) => Promise<void>;
+  buyOrbitItem: (itemId: OrbitItemId) => Promise<void>;
+  equipOrbitItem: (itemId: OrbitItemId) => Promise<void>;
   importLegacyProgress: (progress: PersistedPlayerState) => Promise<void>;
 }
 
@@ -373,6 +376,107 @@ export const usePlayerStore = create<PlayerStoreState>()((set, get) => ({
         ...profile,
         equippedNovaItems: {
           ...profile.equippedNovaItems,
+          [item.slot]: itemId,
+        },
+      },
+    };
+
+    set({
+      ...nextProgress,
+      isSaving: true,
+      saveError: null,
+    });
+
+    try {
+      await saveProgress(nextProgress);
+      set({
+        isSaving: false,
+      });
+    } catch (error) {
+      set({
+        isSaving: false,
+        saveError: getErrorMessage(error),
+      });
+      throw error;
+    }
+  },
+  buyOrbitItem: async (itemId) => {
+    const item = orbitShopItemMap[itemId];
+
+    if (!item) {
+      throw new Error("That Orbit item could not be found.");
+    }
+
+    const profile = get().profile;
+
+    if (!profile.ownedMascots.includes("orbit")) {
+      throw new Error("Unlock Orbit before buying dragon cosmetics.");
+    }
+
+    if (profile.ownedOrbitItems.includes(itemId)) {
+      await get().equipOrbitItem(itemId);
+      return;
+    }
+
+    if (profile.stars < item.requiredStars) {
+      throw new Error(`Earn ${item.requiredStars} stars to unlock ${item.title}.`);
+    }
+
+    if (profile.coins < item.costCoins) {
+      throw new Error(`You need ${item.costCoins} coins to buy ${item.title}.`);
+    }
+
+    const nextProgress: PersistedPlayerState = {
+      ...selectPersistedState(get()),
+      profile: {
+        ...profile,
+        coins: profile.coins - item.costCoins,
+        ownedOrbitItems: [...profile.ownedOrbitItems, itemId],
+        equippedOrbitItems: {
+          ...profile.equippedOrbitItems,
+          [item.slot]: itemId,
+        },
+      },
+    };
+
+    set({
+      ...nextProgress,
+      isSaving: true,
+      saveError: null,
+    });
+
+    try {
+      await saveProgress(nextProgress);
+      set({
+        isSaving: false,
+      });
+    } catch (error) {
+      set({
+        isSaving: false,
+        saveError: getErrorMessage(error),
+      });
+      throw error;
+    }
+  },
+  equipOrbitItem: async (itemId) => {
+    const item = orbitShopItemMap[itemId];
+
+    if (!item) {
+      throw new Error("That Orbit item could not be found.");
+    }
+
+    const profile = get().profile;
+
+    if (!profile.ownedOrbitItems.includes(itemId)) {
+      throw new Error(`Buy ${item.title} before equipping it.`);
+    }
+
+    const nextProgress: PersistedPlayerState = {
+      ...selectPersistedState(get()),
+      profile: {
+        ...profile,
+        equippedOrbitItems: {
+          ...profile.equippedOrbitItems,
           [item.slot]: itemId,
         },
       },
